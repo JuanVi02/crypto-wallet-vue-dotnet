@@ -73,6 +73,9 @@ namespace TrabajoFinal_ProgramacionIII.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Pesos")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Usuarios");

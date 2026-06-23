@@ -31,6 +31,7 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
             {
                 usuarioEncontrado.Id,
                 usuarioEncontrado.Nombre,
+                usuarioEncontrado.Pesos,
                 EsAdmin = usuarioEncontrado.Nombre.ToLower() == "admin"
             });
         }
@@ -49,6 +50,7 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
             {
                 usuario.Id,
                 usuario.Nombre,
+                usuario.Pesos,
                 EsAdmin = usuario.Nombre == "admin"
             });
         }
@@ -56,6 +58,16 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
         [HttpPost("registrar")]
         public IActionResult Registrar([FromBody] Usuario usuario)
         {
+            if (string.IsNullOrWhiteSpace(usuario.Nombre))
+            {
+                return BadRequest("Debe ingresar un nombre de usuario");
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario.Password))
+            {
+                return BadRequest("Debe ingresar una contraseña");
+            }
+
             if (_context.Usuarios.Any(u => u.Nombre == usuario.Nombre))
             {
                 return BadRequest("Ya existe un usuario con ese nombre");
@@ -65,6 +77,32 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
             _context.SaveChanges();
 
             return Ok("Usuario registrado correctamente");
+        }
+
+        [HttpPut("{id}/cargar-pesos")]
+        public IActionResult CargarPesos(int id, [FromBody] decimal monto)
+        {
+            if (monto <= 0)
+            {
+                return BadRequest("El monto debe ser mayor a 0");
+            }
+
+            var usuario = _context.Usuarios.Find(id);
+
+            if (usuario == null)
+            {
+                return NotFound("Usuario no encontrado");
+            }
+
+            usuario.Pesos += monto;
+            _context.SaveChanges();
+
+            return Ok(new
+            {
+                usuario.Id,
+                usuario.Nombre,
+                usuario.Pesos
+            });
         }
     }
 }

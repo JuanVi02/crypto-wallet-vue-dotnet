@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import api from '../services/api'
 
 import { Pie } from 'vue-chartjs'
@@ -17,16 +17,27 @@ const usuario = JSON.parse(localStorage.getItem('usuario'))
 const criptomonedas = ref([])
 const totalGeneral = ref(0)
 const mensaje = ref('')
+const ultimaActualizacion = ref('')
+const cargando = ref(true)
+
+let intervalo = null
 
 const cargarCartera = async () => {
   try {
+    cargando.value = true
+
     const response = await api.get(`/transacciones/estado/${usuario.id}`)
 
     criptomonedas.value = response.data.criptomonedas
     totalGeneral.value = response.data.totalGeneral
+    ultimaActualizacion.value = new Date().toLocaleTimeString()
+    mensaje.value = ''
   }
   catch {
     mensaje.value = 'Error al cargar la cartera'
+  }
+  finally {
+    cargando.value = false
   }
 }
 
@@ -65,12 +76,29 @@ const opcionesGrafico = {
 
 onMounted(() => {
   cargarCartera()
+
+  intervalo = setInterval(() => {
+    cargarCartera()
+  }, 30000)
+})
+
+onUnmounted(() => {
+  clearInterval(intervalo)
 })
 </script>
 
 <template>
   <div>
-    <h1 class="titulo-pagina mb-4">Estado de la cartera</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="titulo-pagina mb-0">Estado de la cartera</h1>
+
+      <span
+        v-if="ultimaActualizacion"
+        class="badge bg-info text-dark"
+      >
+        Última actualización: {{ ultimaActualizacion }}
+      </span>
+    </div>
 
     <div class="row">
       <div
@@ -141,8 +169,12 @@ onMounted(() => {
       </div>
     </div>
 
+    <div v-if="cargando" class="alert alert-info mt-3">
+      Cargando cartera...
+    </div>
+
     <div
-      v-if="criptomonedas.length === 0"
+      v-if="!cargando && criptomonedas.length === 0"
       class="alert alert-warning mt-3"
     >
       No posee criptomonedas actualmente.

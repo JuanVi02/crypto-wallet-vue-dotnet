@@ -91,6 +91,28 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
                 return BadRequest("No se pudo obtener el precio de la criptomoneda");
             }
 
+            var usuario = _context.Usuarios.Find(transaccion.UsuarioId);
+
+            if (usuario == null)
+            {
+                return BadRequest("Usuario no encontrado");
+            }
+
+            if (transaccion.Accion == "compra")
+            {
+                if (usuario.Pesos < transaccion.Dinero)
+                {
+                    return BadRequest("No tenés pesos suficientes para realizar la compra");
+                }
+
+                usuario.Pesos -= transaccion.Dinero;
+            }
+
+            if (transaccion.Accion == "venta")
+            {
+                usuario.Pesos += transaccion.Dinero;
+            }
+
             _context.Transacciones.Add(transaccion);
             _context.SaveChanges();
 
@@ -211,7 +233,7 @@ namespace TrabajoFinal_ProgramacionIII.Controllers
             var response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
-            {
+            {    
                 throw new Exception("Error al obtener el precio de CryptoYa");
             }
 

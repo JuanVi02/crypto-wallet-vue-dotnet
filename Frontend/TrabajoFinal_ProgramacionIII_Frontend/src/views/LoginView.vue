@@ -26,6 +26,17 @@ const login = async () => {
 }
 
 const registrar = async () => {
+  
+  if (!nombre.value.trim()) {
+    mensaje.value = 'Debe ingresar un usuario'
+    return
+  }
+
+  if (!password.value.trim()) {
+    mensaje.value = 'Debe ingresar una contraseña'
+    return
+  }  
+  
   try {
     const response = await api.post('/usuarios/registrar', {
       nombre: nombre.value,

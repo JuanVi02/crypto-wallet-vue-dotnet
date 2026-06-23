@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import api from '../services/api'
 
-const router = useRouter()
 const route = useRoute()
 
 const usuario = JSON.parse(localStorage.getItem('usuario'))
@@ -13,6 +12,8 @@ const accion = ref('compra')
 const cantidad = ref(0)
 const fecha = ref('')
 const mensaje = ref('')
+const precioUnitario = ref(0)
+const valorEstimado = ref(0)
 
 const esEdicion = ref(false)
 const idTransaccion = route.params.id
@@ -31,7 +32,23 @@ const cargarTransaccion = async () => {
   }
 }
 
+const actualizarUsuarioLocal = async () => {
+  const response = await api.get(`/usuarios/${usuario.id}`)
+  localStorage.setItem('usuario', JSON.stringify(response.data))
+}
+
 const guardar = async () => {
+
+  if (!fecha.value) {
+    mensaje.value = 'Debe ingresar una fecha'
+    return
+  }
+
+  if (cantidad.value <= 0) {
+    mensaje.value = 'La cantidad debe ser mayor a 0'
+    return
+  }
+
   try {
     const transaccion = {
       codigoCripto: codigoCripto.value,
@@ -53,7 +70,9 @@ const guardar = async () => {
       })
     }
 
-    router.push('/historial')
+    await actualizarUsuarioLocal()
+
+    window.location.href = '/historial'
   }
   catch (error) {
     if (error.response) {
@@ -64,8 +83,33 @@ const guardar = async () => {
   }
 }
 
-onMounted(() => {
-  cargarTransaccion()
+const obtenerCotizacion = async () => {
+  try {
+    const codigo = codigoCripto.value.toLowerCase()
+    const response = await fetch(`https://criptoya.com/api/binance/${codigo}/ars/1`)
+    const data = await response.json()
+
+    if (accion.value === 'compra') {
+      precioUnitario.value = data.ask
+    } else {
+      precioUnitario.value = data.bid
+    }
+
+    valorEstimado.value = cantidad.value * precioUnitario.value
+  }
+  catch {
+    precioUnitario.value = 0
+    valorEstimado.value = 0
+  }
+}
+
+watch([codigoCripto, accion, cantidad], () => {
+  obtenerCotizacion()
+})
+
+onMounted(async () => {
+  await cargarTransaccion()
+  obtenerCotizacion()
 })
 </script>
 
@@ -103,6 +147,18 @@ onMounted(() => {
               v-model="cantidad"
               class="form-control"
             >
+          </div>
+
+          <div class="alert alert-info mt-3">
+            <p class="mb-1">
+              <strong>Precio de 1 {{ codigoCripto.toUpperCase() }}:</strong>
+              ${{ precioUnitario.toFixed(2) }} ARS
+            </p>
+
+            <p class="mb-0">
+              <strong>Valor estimado:</strong>
+              ${{ valorEstimado.toFixed(2) }} ARS
+            </p>
           </div>
 
           <div class="mb-3">

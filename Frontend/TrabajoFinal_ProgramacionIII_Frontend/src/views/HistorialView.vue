@@ -75,8 +75,8 @@ onMounted(() => {
                   {{ t.accion }}
                 </span>
               </td>
-              <td>{{ t.cantidad }}</td>
-              <td>${{ t.dinero.toFixed(2) }}</td>
+              <td>{{ t.cantidad.toFixed(2) }}</td>
+              <td>${{ t.dinero.toFixed(2) }} ARS</td>
 
               <td v-if="usuario?.esAdmin">
                 <button
