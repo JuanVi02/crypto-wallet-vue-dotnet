@@ -1,0 +1,13 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #121826;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+}

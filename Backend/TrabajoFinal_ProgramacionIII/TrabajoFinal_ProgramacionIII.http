@@ -1,0 +1,6 @@
+@TrabajoFinal_ProgramacionIII_HostAddress = http://localhost:5113
+
+GET {{TrabajoFinal_ProgramacionIII_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

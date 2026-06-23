@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #0F172A, #111827);
+  color: #ffffff;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.card {
+  background-color: #1E293B !important;
+  color: #ffffff !important;
+  border: 1px solid #334155 !important;
+}
+
+.table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.form-control,
+.form-select {
+  border-radius: 8px;
+}
+
+h1, h2, h3, h4 {
+  color: #ffffff;
+}
+
+.titulo-pagina {
+  color: #ffffff !important;
+  font-weight: 700;
+}
