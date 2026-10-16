@@ -12,9 +12,13 @@ Features:
 - Responsive interface
   
 Technologies:
+
 Frontend: Vue.js, Vue Router, JavaScript, Bootstrap
+
 Backend: ASP.NET Core Web API, C#, Entity Framework Core
+
 Database: SQL Server
+
 External API: CriptoYa
 
 Architecture:
